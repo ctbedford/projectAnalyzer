@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Determine the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+# Run the Python script with all arguments passed to this shell script
+python3 "$SCRIPT_DIR/project_analyzer.py" "$@"
+
