@@ -131,26 +131,53 @@ def analyze_project_structure(project_structure: Dict) -> Dict[str, str]:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Analyze project structure")
-    parser.add_argument("root", help="Root directory of the project")
-    parser.add_argument("--output", help="Output file for analysis results",
+    parser = argparse.ArgumentParser(
+        description="Analyze project structure and generate a JSON report of files and directories.",
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+    parser.add_argument("root",
+                        help="Root directory of the project to analyze. Must be a valid path.")
+    parser.add_argument("--output",
+                        help="Output file for analysis results (default: ./project_structure.json)\n"
+                             "Specify a valid file path with .json extension.",
                         default="./project_structure.json")
-    parser.add_argument("--files", nargs="*", help="Specific files to analyze")
-    parser.add_argument("--no-content", action="store_true",
-                        help="Exclude file content from the analysis")
-    parser.add_argument("--exclude-dirs", nargs="*",
-                        help="Additional directories to exclude (default: node_modules, venv, .git, __pycache__, migrations, build, .mypy_cache)")
-    parser.add_argument("--include-types", nargs="*",
-                        help="File types to include (default: .py, .js, .jsx, .ts, .tsx, .json, .yml, .yaml, .md, .html, .css)")
-    parser.add_argument("--content-preview", action="store_true",
-                        help="Include only a preview of file content (first 10 lines)")
-    parser.add_argument("--ignore-large-files", action="store_true",
-                        help="Ignore files larger than specified size")
-    parser.add_argument("--max-file-size", type=int, default=1024*1024,
-                        help="Maximum file size in bytes to process (default: 1048576 bytes)")
+    parser.add_argument("--files",
+                        nargs="*",
+                        help="Specific files to analyze. Can be file names or relative paths.\n"
+                             "If not specified, all files matching --include-types will be analyzed.")
+    parser.add_argument("--no-content",
+                        action="store_true",
+                        help="Exclude file content from the analysis. Reduces output size but provides less detail.")
+    parser.add_argument("--exclude-dirs",
+                        nargs="*",
+                        help="Additional directories to exclude from analysis.\n"
+                             "Default excluded: node_modules, venv, .git, __pycache__, migrations, build, .mypy_cache\n"
+                             "Specify as space-separated list, e.g., --exclude-dirs tests docs")
+    parser.add_argument("--include-types",
+                        nargs="*",
+                        help="File types to include in the analysis.\n"
+                             "Default: .py .js .jsx .ts .tsx .json .yml .yaml .md .html .css\n"
+                             "Specify as space-separated list with leading dot, e.g., --include-types .py .js .ts")
+    parser.add_argument("--content-preview",
+                        action="store_true",
+                        help="Include only a preview of file content (first 10 lines) instead of full content.\n"
+                             "Useful for reducing output size while still providing some content insight.")
+    parser.add_argument("--ignore-large-files",
+                        action="store_true",
+                        help="Ignore files larger than the size specified by --max-file-size.\n"
+                             "Useful for excluding large binary or data files from analysis.")
+    parser.add_argument("--max-file-size",
+                        type=int,
+                        default=1024*1024,
+                        help="Maximum file size in bytes to process (default: 1048576 bytes, i.e., 1 MB)\n"
+                             "Files larger than this will be ignored if --ignore-large-files is set.\n"
+                             "Acceptable range: 1 to 1073741824 (1 GB)")
 
     args = parser.parse_args()
 
+    # Validate max_file_size
+    if args.max_file_size < 1 or args.max_file_size > 1073741824:
+        parser.error("--max-file-size must be between 1 and 1073741824 (1 GB)")
     project_structure = analyze_project(
         args.root,
         args.files,

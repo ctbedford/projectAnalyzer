@@ -51,13 +51,28 @@ projectanalyzer /path/to/project --output /path/to/output.json [OPTIONS]
 
 Options
 
-    --files: Specify specific files to analyze.
-    --no-content: Exclude file content from the analysis.
-    --exclude-dirs: Additional directories to exclude (comma-separated list).
-    --include-types: File types to include (comma-separated list).
-    --content-preview: Include only a preview of file content (first 10 lines).
-    --ignore-large-files: Ignore files larger than the specified size.
-    --max-file-size: Maximum file size (in bytes) to process.
+    -h, --help            show this help message and exit
+    --output OUTPUT       Output file for analysis results (default: ./project_structure.json)
+                          Specify a valid file path with .json extension.
+    --files [FILES ...]   Specific files to analyze. Can be file names or relative paths.
+                          If not specified, all files matching --include-types will be analyzed.
+    --no-content          Exclude file content from the analysis. Reduces output size but provides less detail.
+    --exclude-dirs [EXCLUDE_DIRS ...]
+                          Additional directories to exclude from analysis.
+                          Default excluded: node_modules, venv, .git, __pycache__, migrations, build, .mypy_cache
+                          Specify as space-separated list, e.g., --exclude-dirs tests docs
+    --include-types [INCLUDE_TYPES ...]
+                          File types to include in the analysis.
+                          Default: .py .js .jsx .ts .tsx .json .yml .yaml .md .html .css
+                          Specify as space-separated list with leading dot, e.g., --include-types .py .js .ts
+    --content-preview     Include only a preview of file content (first 10 lines) instead of full content.
+                          Useful for reducing output size while still providing some content insight.
+    --ignore-large-files  Ignore files larger than the size specified by --max-file-size.
+                          Useful for excluding large binary or data files from analysis.
+    --max-file-size MAX_FILE_SIZE
+                          Maximum file size in bytes to process (default: 1048576 bytes, i.e., 1 MB)
+                          Files larger than this will be ignored if --ignore-large-files is set.
+                          Acceptable range: 1 to 1073741824 (1 GB)
 
 Example
 
